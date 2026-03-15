@@ -6,9 +6,22 @@ from main import BooksCollector
 def collector():
     return BooksCollector()
 
+
 def test_add_new_book_adds_book_without_genre(collector):
     collector.add_new_book('Гарри Поттер')
     assert collector.get_books_genre() == {'Гарри Поттер': ''}
+
+
+def test_add_new_book_adds_book_with_min_length_name(collector):
+    name = 'A'  # длина 1
+    collector.add_new_book(name)
+    assert name in collector.get_books_genre()
+
+
+def test_add_new_book_adds_book_with_max_allowed_length_name(collector):
+    name = 'A' * 40  # длина 40
+    collector.add_new_book(name)
+    assert name in collector.get_books_genre()
 
 
 def test_add_new_book_not_added_if_name_too_long(collector):
@@ -39,7 +52,6 @@ def test_set_book_genre_does_not_set_if_genre_not_allowed(collector):
     collector.add_new_book('Книга')
     collector.set_book_genre('Книга', 'Роман')
     assert collector.get_book_genre('Книга') == ''
-
 
 
 def test_get_book_genre_returns_none_for_unknown_book(collector):
@@ -90,12 +102,15 @@ def test_get_books_for_children_ignores_books_without_genre(collector):
     assert collector.get_books_for_children() == []
 
 
-
 def test_add_book_in_favorites_adds_only_existing_book(collector):
     collector.add_new_book('Книга')
     collector.add_book_in_favorites('Книга')
-    collector.add_book_in_favorites('Несуществующая')
     assert collector.get_list_of_favorites_books() == ['Книга']
+
+
+def test_add_book_in_favorites_does_not_add_if_book_not_in_collection(collector):
+    collector.add_book_in_favorites('Несуществующая')
+    assert collector.get_list_of_favorites_books() == []
 
 
 def test_add_book_in_favorites_not_added_twice(collector):
@@ -103,7 +118,6 @@ def test_add_book_in_favorites_not_added_twice(collector):
     collector.add_book_in_favorites('Книга')
     collector.add_book_in_favorites('Книга')
     assert collector.get_list_of_favorites_books() == ['Книга']
-
 
 
 def test_delete_book_from_favorites_removes_if_exists(collector):
